@@ -1,22 +1,26 @@
-import os
 import json
-import re
 import mmap
+import os
+import re
 from concurrent.futures import ThreadPoolExecutor
+
 from regex import regex
+
 
 class DictionaryLoadError(Exception):
     pass
 
+
 class NoDictionaryLocationError(Exception):
     pass
+
 
 class Unredactor:
     """
     Class to unredact a file using a dictionary of replacements.
     """
 
-    def __init__(self, dict_location=None, chunk_size=64*1024, num_threads=1):
+    def __init__(self, dict_location=None, chunk_size=64 * 1024, num_threads=1):
         """
         Initializes the Unredactor object.
 
@@ -74,7 +78,9 @@ class Unredactor:
         Returns:
             List[bytes]: The chunks of data.
         """
-        return [data[i:i+self.chunk_size] for i in range(0, len(data), self.chunk_size)]
+        return [
+            data[i : i + self.chunk_size] for i in range(0, len(data), self.chunk_size)
+        ]
 
     def _unredact_chunk(self, chunk_idx, chunk, f_out):
         """

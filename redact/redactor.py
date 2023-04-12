@@ -1,7 +1,8 @@
-import os
 import json
+import os
 import random
 import string
+
 
 class Redactor:
     def __init__(self, config_file):
@@ -12,8 +13,9 @@ class Redactor:
             raise ValueError("Missing required key 'substrings' in configuration file")
 
         if not isinstance(self.config["substrings"], list):
-            raise TypeError("Value of key 'substrings' must be a list in configuration file")
-
+            raise TypeError(
+                "Value of key 'substrings' must be a list in configuration file"
+            )
 
     def redact_file(self, input_file, dict_location=None):
         try:
@@ -28,11 +30,17 @@ class Redactor:
 
         replacement_dict = {}
         for substring in self.config["substrings"]:
-            for case_sensitive_substring in {substring, substring.lower(), substring.upper()}:
+            for case_sensitive_substring in {
+                substring,
+                substring.lower(),
+                substring.upper(),
+            }:
                 if case_sensitive_substring not in content:
                     continue
 
-                random_string = self._generate_random_string(len(case_sensitive_substring))
+                random_string = self._generate_random_string(
+                    len(case_sensitive_substring)
+                )
                 replacement_dict[case_sensitive_substring] = random_string
                 content = content.replace(case_sensitive_substring, random_string)
 
@@ -53,11 +61,10 @@ class Redactor:
                 return
 
     def _generate_random_string(self, length):
-        return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
+        return "".join(random.choices(string.ascii_letters + string.digits, k=length))
 
     def _create_output_file_name(self, input_file):
         name, extension = os.path.splitext(input_file)
         if not extension:
             extension = ".txt"
         return f"{name}_redacted{extension}"
-
