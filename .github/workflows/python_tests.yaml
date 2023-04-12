@@ -38,7 +38,7 @@ jobs:
 
     - name: Run tests
       run: |
-        python -m unittest discover
+        pytest tests
 
     - name: Cache dependencies
       uses: actions/cache@v2
@@ -47,4 +47,3 @@ jobs:
         key: ${{ runner.os }}-pip-${{ hashFiles('requirements*.txt') }}
         restore-keys: |
           ${{ runner.os }}-pip-
-
