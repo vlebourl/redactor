@@ -1,0 +1,22 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Local development settings
+venv/
+.vscode/
+.idea/
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Tests
+.coverage
+htmlcov/
+
+# Other
+*.swp
+.DS_Store
