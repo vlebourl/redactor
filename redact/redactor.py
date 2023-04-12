@@ -50,10 +50,12 @@ class RedactorConfig:
                 "Value of key 'substrings' must be a list in configuration file"
             )
 
-        self.case_insensitive_substrings = [
-            regex.compile(regex.escape(substring), regex.IGNORECASE)
-            for substring in self.config["substrings"]
-        ]
+        self.joint_pattern = regex.compile(
+            "|".join(
+                [regex.escape(substring) for substring in self.config["substrings"]]
+            ),
+            regex.IGNORECASE,
+        )
 
 
 class Redactor:
@@ -107,11 +109,6 @@ class Redactor:
         replacement_dict = {}
         chunk_text = chunk.decode("utf-8")
 
-        patterns = [
-            regex.escape(substring) for substring in self.config.config["substrings"]
-        ]
-        joint_pattern = regex.compile("|".join(patterns), regex.IGNORECASE)
-
         def replace_match(match):
             old = match.group(0)
             if old not in replacement_dict:
@@ -119,7 +116,7 @@ class Redactor:
                 replacement_dict[old] = random_string
             return replacement_dict[old]
 
-        chunk_text = joint_pattern.sub(replace_match, chunk_text)
+        chunk_text = self.config.joint_pattern.sub(replace_match, chunk_text)
         return replacement_dict, chunk_text.encode("utf-8")
 
     def _create_output_file_name(self, file_path: str) -> str:
@@ -129,7 +126,7 @@ class Redactor:
 
     def _save_replacement_dict(
         self, replacement_dicts: List[concurrent.futures.Future], dict_location: str
-    ) -> None:
+    ) -> None:  # sourcery skip: dict-assign-update-to-union
         combined_dict = {}
         for future in replacement_dicts:
             combined_dict.update(future.result()[0])

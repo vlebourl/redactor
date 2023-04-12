@@ -1,14 +1,20 @@
 import json
 import os
 import random
-
-import nltk
-from nltk.corpus import brown
+import string
 
 from redact.redactor import Redactor
 from redact.unredactor import Unredactor
 
-nltk.download("brown")
+
+def create_random_word(min_length=4, max_length=10):
+    length = random.randint(min_length, max_length)
+    return "".join(random.choices(string.ascii_lowercase, k=length))
+
+
+def insert_substring_in_word(word, substring):
+    index = random.randint(0, len(word))
+    return word[:index] + substring + word[index:]
 
 
 def create_config_file():
@@ -42,43 +48,26 @@ def create_test_file():
         "content",
         "value",
     ]
-    words = [w.lower() for w in brown.words() if w.isalpha() and len(w) > 3]
-    random.shuffle(words)
-    selected_words = []
-    for substring in substrings:
-        for word in words:
-            if substring in word:
-                # Randomize the casing of the substring
-                substr_len = len(substring)
-                idx = word.lower().find(substring.lower())
-                if idx >= 0:
-                    selected_words.append(
-                        word[:idx]
-                        + word[idx : idx + substr_len].swapcase()
-                        + word[idx + substr_len :]
-                    )
-                if len(selected_words) == 10:
-                    break
-        if len(selected_words) < 10:
-            # If there are not enough words with the substring, select random words
-            selected_words.extend(words[: 10 - len(selected_words)])
 
-    words = selected_words
-    random.shuffle(words)
+    # Generate sentences with random words and at least 5 substrings
+    sentences = []
+    for _ in range(10):
+        random_words = [create_random_word() for _ in range(15)]
+        substrings_sample = random.sample(substrings, 5)
 
+        # Insert substrings into random words
+        for substring in substrings_sample:
+            word = random.choice(random_words)
+            new_word = insert_substring_in_word(word, substring)
+            random_words[random_words.index(word)] = new_word
+
+        sentence = " ".join(random_words)
+        sentences.append(sentence)
+
+    # Save the test file
     with open("test.txt", "w") as f:
-        for i, word in enumerate(words):
-            if i % 10 == 9:
-                f.write(f"{word}\n")
-            else:
-                f.write(f"{word} ")
-
-    with open("test.txt", "w") as f:
-        for i, word in enumerate(words):
-            if i % 10 == 9:
-                f.write(f"{word}\n")
-            else:
-                f.write(f"{word} ")
+        for sentence in sentences:
+            f.write(f"{sentence}\n")
 
 
 def test_redactor_and_unredactor():
@@ -104,6 +93,7 @@ def test_redactor_and_unredactor():
     with open("test.txt", "r") as f1, open("test_unredacted.txt", "r") as f2:
         original_text = f1.read()
         unredacted_text = f2.read()
+        assert len(unredacted_text) > 0
         assert original_text == unredacted_text
 
     os.remove("config.json")
