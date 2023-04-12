@@ -1,0 +1,32 @@
+name: SonarQube analysis
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  sonarqube:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: "11"
+      - name: Download SonarQube Scanner
+        run: |
+          curl -L -O https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip
+          unzip sonar-scanner-cli-4.6.2.2472-linux.zip
+          mv sonar-scanner-4.6.2.2472-linux /usr/local/sonar-scanner
+      - name: Analyze code with SonarQube
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          /usr/local/sonar-scanner/bin/sonar-scanner \
+            -Dsonar.projectKey=vlebourl_redactor \
+            -Dsonar.organization=vlebourl \
+            -Dsonar.sources=. \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.login=$SONAR_TOKEN

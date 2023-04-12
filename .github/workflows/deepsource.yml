@@ -1,0 +1,27 @@
+name: DeepSource review
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  deepsource:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.x"
+      - name: Install DeepSource CLI
+        run: curl https://deepsource.io/cli | sh
+      - name: Authenticate with DeepSource
+        env:
+          DEEPSOURCE_TOKEN: ${{ secrets.DEEPSOURCE_TOKEN }}
+        run: deepsource auth login --token $DEEPSOURCE_TOKEN
+      - name: Run DeepSource review
+        env:
+          DEEPSOURCE_TOKEN: ${{ secrets.DEEPSOURCE_TOKEN }}
+        run: deepsource analyze --on-pull-request --token $DEEPSOURCE_TOKEN

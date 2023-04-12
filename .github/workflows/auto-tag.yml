@@ -1,0 +1,26 @@
+name: Auto-tag pull requests
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - fix/*
+      - feature/*
+      - enhance/*
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Auto-tag pull request
+        uses: catthehacker/github-action-auto-tag@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          prefix: ${{ replace(github.head_ref, "/.*$", "") }}
+          prefix_delimiter: "-"
+          custom_tag: ""
+          custom_tag_delimiter: ""
