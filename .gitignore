@@ -20,3 +20,8 @@ htmlcov/
 # Other
 *.swp
 .DS_Store
+test.txt
+test_unredacted.txt
+test_redacted.txt.dict
+test_redacted.txt
+config.json

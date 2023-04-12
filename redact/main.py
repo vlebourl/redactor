@@ -1,8 +1,7 @@
 import argparse
 
-from unredactor import Unredactor
-
-from redactor import Redactor
+from .redactor import Redactor
+from .unredactor import Unredactor
 
 
 def main():
@@ -35,13 +34,12 @@ def main():
     args = parser.parse_args()
 
     try:
-        with open(args.input_file, "r") as f:
-            if args.action == "redact":
-                redactor = Redactor(args.config_file)
-                redactor.redact_file(f, args.dict_location)
-            elif args.action == "unredact":
-                unredactor = Unredactor(args.dict_location)
-                unredactor.unredact_file(f)
+        if args.action == "redact":
+            redactor = Redactor(args.config_file)
+            redactor.redact_file(args.input_file, args.dict_location)
+        elif args.action == "unredact":
+            unredactor = Unredactor(args.dict_location)
+            unredactor.unredact_file(args.input_file)
     except FileNotFoundError:
         print(f"File not found: {args.input_file}")
     except PermissionError:
